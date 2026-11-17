@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0b0f17">
-  <meta name="description" content="Đặt lịch học và kết nối trực tiếp với cố vấn phù hợp.">
+  <meta name="description" content="Chọn cố vấn, khung giờ và đặt lịch tư vấn học tập phù hợp với mục tiêu của bạn.">
   <title>Đặt lịch cố vấn | Mentor-Mentee Connector</title>
+  <link rel="stylesheet" href="css/style.css">
   <style>
     :root {
       color-scheme: dark;
@@ -105,6 +106,16 @@
     }
 
     .nav-links a[aria-current="page"] { color: var(--cyan); }
+    .menu-toggle, .theme-toggle {
+      min-width: 40px;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      cursor: pointer;
+    }
+    .menu-toggle { display: none; }
 
     main { padding: 54px 0 72px; }
 
@@ -562,11 +573,14 @@
 
     @media (max-width: 600px) {
       .header-inner, main, .footer-inner { width: min(100% - 28px, 1120px); }
-      .header-inner { min-height: 68px; flex-wrap: wrap; gap: 7px; padding: 12px 0; }
+      .header-inner { position: relative; min-height: 68px; flex-wrap: wrap; gap: 7px; padding: 12px 0; }
       .brand { font-size: .86rem; }
       .brand-mark { width: 31px; height: 31px; }
-      .nav-links { width: 100%; gap: 2px; overflow-x: auto; }
-      .nav-links a { padding: 7px 9px; font-size: .76rem; white-space: nowrap; }
+      .menu-toggle { display: inline-grid; place-items: center; margin-left: auto; }
+      .theme-toggle { order: 2; }
+      .nav-links { position: absolute; z-index: 8; top: calc(100% + 1px); right: 0; left: 0; display: none; width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 16px 35px rgba(0,0,0,.24); }
+      .nav-links.is-open { display: grid; }
+      .nav-links a { padding: 10px 12px; font-size: .82rem; white-space: nowrap; }
       main { padding: 35px 0 48px; }
       .page-heading { display: block; margin-bottom: 22px; }
       .page-heading p { font-size: .9rem; }
@@ -587,6 +601,8 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
     }
   </style>
+  <script src="js/data.js" defer></script>
+  <script src="js/site.js" defer></script>
   <script src="js/form-handler.js" defer></script>
 </head>
 <body>
@@ -596,12 +612,16 @@
         <span class="brand-mark" aria-hidden="true">✦</span>
         <span>Mentor-Mentee Connector</span>
       </a>
-      <nav class="nav-links" aria-label="Điều hướng chính">
-        <a href="index.html">Tìm cố vấn</a>
-        <a href="mentor-profile.html">Hồ sơ cố vấn</a>
-        <a href="#booking-preview">Lịch đã đặt</a>
+      <button class="menu-toggle" type="button" data-menu-toggle aria-controls="main-navigation" aria-expanded="false" aria-label="Mở menu">☰</button>
+      <nav class="nav-links" id="main-navigation" aria-label="Điều hướng chính">
+        <a href="index.html">Trang chủ</a>
+        <a href="mentors.html">Cố vấn</a>
+        <a href="appointments.html">Lịch hẹn</a>
+        <a href="study-groups.html">Nhóm học</a>
+        <a href="about.html">Giới thiệu</a>
         <a href="booking.html" aria-current="page">Đặt lịch</a>
       </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Chuyển sang giao diện tối" aria-pressed="false">🌙</button>
     </div>
   </header>
 
@@ -637,6 +657,12 @@
               <label for="menteeEmail">Email liên hệ <span class="required" aria-hidden="true">*</span></label>
               <input type="email" id="menteeEmail" name="menteeEmail" autocomplete="email" inputmode="email" placeholder="ban@email.com" required aria-describedby="menteeEmailError">
               <p class="field-error" id="menteeEmailError"></p>
+            </div>
+
+            <div class="field">
+              <label for="menteePhone">Số điện thoại <span class="required" aria-hidden="true">*</span></label>
+              <input type="tel" id="menteePhone" name="menteePhone" autocomplete="tel" inputmode="tel" placeholder="0912345678" required aria-describedby="menteePhoneError">
+              <p class="field-error" id="menteePhoneError"></p>
             </div>
 
             <div class="field">
@@ -696,6 +722,7 @@
             <div><dt>Chủ đề</dt><dd id="successTopic"></dd></div>
             <div class="detail-wide"><dt>Mục tiêu</dt><dd id="successGoal"></dd></div>
           </dl>
+          <a class="button button-secondary" href="appointments.html">Xem tất cả lịch hẹn <span aria-hidden="true">→</span></a>
         </section>
       </section>
 

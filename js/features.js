@@ -1,172 +1,93 @@
 (function () {
   "use strict";
 
-  const itemSelector =
-    "[data-feature-item], .mentor-card, .study-group-card";
-  const searchSelector =
-    "[data-feature-search], #search-input, #searchInput";
-  const skillSelector = "[data-skill-filter], .skill-tag";
-  const ratingSelector =
-    "[data-rating-filter], [data-rating-min], #rating-filter";
-  const sortSelector = "[data-feature-sort]";
+  const activeSkills = new Set();
+  let activeCategory = "all";
 
   function normalize(value) {
-    return String(value || "")
-      .trim()
-      .toLocaleLowerCase();
+    return String(value || "").trim().toLocaleLowerCase();
   }
 
-  function getItemSkills(item) {
-    const skills = (item.dataset.skills || "")
-      .split(",")
-      .map(normalize)
-      .filter(Boolean);
-
-    item.querySelectorAll("[data-skill]").forEach(function (skill) {
-      const value = normalize(skill.dataset.skill);
-      if (value) {
-        skills.push(value);
-      }
+  function update() {
+    const items = Array.from(document.querySelectorAll("[data-feature-item]"));
+    const search = document.querySelector("[data-feature-search]");
+    const sort = document.querySelector("[data-feature-sort]");
+    const keyword = normalize(search && search.value);
+    const mode = normalize(sort && sort.value || "rating-desc");
+    const visible = items.filter(function (item) {
+      const text = normalize((item.dataset.search || "") + " " + item.textContent);
+      const matchesSkills = activeSkills.size === 0 ||
+        Array.from(activeSkills).some(function (skill) { return text.includes(skill); });
+      const matchesCategory = activeCategory === "all" ||
+        normalize(item.dataset.category) === activeCategory;
+      return (!keyword || text.includes(keyword)) && matchesSkills && matchesCategory;
     });
 
-    return skills;
-  }
-
-  function getRating(item) {
-    const ratingElement = item.querySelector("[data-rating-value]");
-    const value = item.dataset.rating ||
-      (ratingElement && ratingElement.dataset.ratingValue) ||
-      "0";
-    const rating = Number(value);
-    return Number.isFinite(rating) ? rating : 0;
-  }
-
-  function getSortMode(sortControls) {
-    const sortControl = sortControls[0];
-    return normalize((sortControl && sortControl.value) || "rating-desc");
-  }
-
-  function sortItems(items, mode) {
-    return items.sort(function (a, b) {
-      if (mode === "rating-asc") {
-        return getRating(a) - getRating(b);
-      }
+    visible.sort(function (a, b) {
       if (mode === "name-asc") {
-        return (a.dataset.name || a.textContent).localeCompare(
-          b.dataset.name || b.textContent
-        );
+        return normalize(a.dataset.name).localeCompare(normalize(b.dataset.name), "vi");
       }
-      return getRating(b) - getRating(a);
+      if (mode === "rating-asc" || mode === "rating-desc") {
+        const difference = Number(a.dataset.rating || 0) - Number(b.dataset.rating || 0);
+        if (difference) return mode === "rating-asc" ? difference : -difference;
+      }
+      return Number(a.dataset.order || 0) - Number(b.dataset.order || 0);
     });
+
+    items.forEach(function (item) {
+      item.hidden = !visible.includes(item);
+      item.setAttribute("aria-hidden", String(item.hidden));
+    });
+    const parents = new Set(visible.map(function (item) { return item.parentElement; }));
+    parents.forEach(function (parent) {
+      const anchor = parent.querySelector("[data-feature-static]");
+      visible.filter(function (item) { return item.parentElement === parent; })
+        .forEach(function (item) { parent.appendChild(item); });
+      if (anchor) parent.appendChild(anchor);
+    });
+
+    const status = document.querySelector("[data-feature-status]");
+    if (status) status.textContent = "Hiển thị " + visible.length + " kết quả.";
   }
 
-  function init() {
-    const items = Array.from(document.querySelectorAll(itemSelector));
-    if (!items.length) {
-      return;
-    }
-
-    const searchInputs = document.querySelectorAll(searchSelector);
-    const skillTags = document.querySelectorAll(skillSelector);
-    const ratingControls = document.querySelectorAll(ratingSelector);
-    const sortControls = document.querySelectorAll(sortSelector);
-    const activeSkills = new Set();
-
-    function applyFilters() {
-      const keyword = normalize(
-        Array.from(searchInputs).map(function (input) {
-          return input.value;
-        }).join(" ")
-      );
-      const minimumRating = Array.from(ratingControls).reduce(
-        function (minimum, control) {
-          const value = Number(control.value);
-          return Number.isFinite(value) ? Math.max(minimum, value) : minimum;
-        },
-        0
-      );
-      const mode = getSortMode(sortControls);
-
-      const visibleItems = items.filter(function (item) {
-        const searchableText = normalize(
-          (item.dataset.search || "") + " " + item.textContent
-        );
-        const skills = getItemSkills(item);
-        const matchesKeyword = !keyword || searchableText.includes(keyword);
-        const matchesSkill =
-          activeSkills.size === 0 ||
-          Array.from(activeSkills).some(function (skill) {
-            return skills.includes(skill);
-          });
-
-        return (
-          matchesKeyword &&
-          matchesSkill &&
-          getRating(item) >= minimumRating
-        );
-      });
-
-      items.forEach(function (item) {
-        const isVisible = visibleItems.includes(item);
-        item.hidden = !isVisible;
-        item.setAttribute("aria-hidden", String(!isVisible));
-      });
-
-      const itemsByParent = new Map();
-      visibleItems.forEach(function (item) {
-        const siblings = itemsByParent.get(item.parentElement) || [];
-        siblings.push(item);
-        itemsByParent.set(item.parentElement, siblings);
-      });
-
-      itemsByParent.forEach(function (siblings, parent) {
-        sortItems(siblings, mode).forEach(function (item) {
-          parent.appendChild(item);
-        });
-      });
-    }
-
-    searchInputs.forEach(function (input) {
-      input.addEventListener("input", applyFilters);
-    });
-
-    skillTags.forEach(function (tag) {
+  function initializeFeatures(root) {
+    const container = root || document;
+    container.querySelectorAll("[data-skill-filter]").forEach(function (tag) {
+      if (tag.dataset.filterBound) return;
+      tag.dataset.filterBound = "true";
       tag.setAttribute("aria-pressed", "false");
       tag.addEventListener("click", function () {
-        const skill = normalize(
-          tag.dataset.skillFilter || tag.dataset.skill || tag.textContent
-        );
-        if (!skill) {
-          return;
-        }
-
-        if (activeSkills.has(skill)) {
-          activeSkills.delete(skill);
-        } else {
-          activeSkills.add(skill);
-        }
-
+        const skill = normalize(tag.dataset.skillFilter);
+        if (activeSkills.has(skill)) activeSkills.delete(skill);
+        else activeSkills.add(skill);
         tag.setAttribute("aria-pressed", String(activeSkills.has(skill)));
         tag.classList.toggle("active", activeSkills.has(skill));
-        applyFilters();
+        update();
       });
     });
-
-    ratingControls.forEach(function (control) {
-      control.addEventListener("input", applyFilters);
-      control.addEventListener("change", applyFilters);
-    });
-
-    sortControls.forEach(function (control) {
-      control.addEventListener("change", applyFilters);
-    });
-
-    applyFilters();
+    update();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-})();
+  document.addEventListener("DOMContentLoaded", function () {
+    const search = document.querySelector("[data-feature-search]");
+    const sort = document.querySelector("[data-feature-sort]");
+    if (search) search.addEventListener("input", update);
+    if (sort) sort.addEventListener("change", update);
+
+    document.querySelectorAll("[data-category-filter]").forEach(function (button) {
+      button.setAttribute("aria-pressed", String(button.classList.contains("is-selected")));
+      button.addEventListener("click", function () {
+        activeCategory = normalize(button.dataset.categoryFilter || "all");
+        document.querySelectorAll("[data-category-filter]").forEach(function (filter) {
+          const selected = filter === button;
+          filter.classList.toggle("is-selected", selected);
+          filter.setAttribute("aria-pressed", String(selected));
+        });
+        update();
+      });
+    });
+    initializeFeatures(document);
+  });
+
+  window.initializeFeatures = initializeFeatures;
+}());

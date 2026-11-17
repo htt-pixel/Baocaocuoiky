@@ -3,27 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lịch hẹn của tôi | Mentor-Mentee Connector</title>
-  <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; }
-    body { margin: 0 auto; max-width: 52rem; padding: 1.5rem; color: #172033; }
-    nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
-    a { color: #175cd3; }
-    li { border: 1px solid #d0d5dd; border-radius: .75rem; margin: 1rem 0; padding: 1rem; }
-    h1 { margin-bottom: .5rem; }
-    button { cursor: pointer; padding: .5rem .75rem; }
-  </style>
+  <meta name="description" content="Quản lý các buổi hẹn cố vấn đã đặt và cập nhật lịch học của bạn.">
+  <title>Lịch hẹn của tôi | Học Cùng Nhau</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/site.js" defer></script>
+  <script src="js/main.js" defer></script>
 </head>
 <body>
-  <nav aria-label="Điều hướng chính">
-    <a href="index.html">Trang chủ</a>
-    <a href="appointments.html" aria-current="page">Lịch hẹn của tôi</a>
-  </nav>
-  <main>
-    <h1>Lịch hẹn của tôi</h1>
-    <p data-appointments-status role="status" aria-live="polite"></p>
-    <ul data-appointments-list aria-label="Danh sách lịch hẹn"></ul>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">HC</span><span>Học Cùng Nhau</span></a>
+      <button class="menu-toggle" type="button" data-menu-toggle aria-controls="main-navigation" aria-expanded="false" aria-label="Mở menu">☰</button>
+      <nav class="main-nav" id="main-navigation" aria-label="Điều hướng chính">
+        <a class="nav-link" href="index.html">Trang chủ</a>
+        <a class="nav-link" href="mentors.html">Cố vấn</a>
+        <a class="nav-link" href="booking.html">Đặt lịch</a>
+        <a class="nav-link is-active" href="appointments.html" aria-current="page">Lịch hẹn</a>
+        <a class="nav-link" href="study-groups.html">Nhóm học tập</a>
+        <a class="nav-link" href="about.html">Giới thiệu</a>
+      </nav>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Chuyển sang giao diện tối" aria-pressed="false">🌙</button>
+    </div>
+  </header>
+  <main class="container appointments-main">
+    <section aria-labelledby="appointments-title">
+      <div class="section-heading">
+        <div><span class="eyebrow">Kế hoạch học tập</span><h1 id="appointments-title">Lịch hẹn của tôi</h1></div>
+        <a class="button button-primary" href="booking.html">Đặt lịch mới <span aria-hidden="true">→</span></a>
+      </div>
+      <p data-appointments-status role="status" aria-live="polite"></p>
+      <ul class="appointment-list" data-appointments-list aria-label="Danh sách lịch hẹn"></ul>
+    </section>
   </main>
-  <script src="js/main.js" defer></script>
+  <footer class="site-footer">
+    <div class="container footer-bottom"><span>© 2025 Học Cùng Nhau.</span><span>Cùng học, cùng lớn.</span></div>
+  </footer>
 </body>
 </html>
