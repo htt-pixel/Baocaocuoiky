@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tìm cố vấn phù hợp với kỹ năng và mục tiêu học tập của bạn.">
+  <title>Danh sách cố vấn | Mentor Connect</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="js/data.js" defer></script>
+  <script src="js/render.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="mentors.html">mentor<span>connect</span></a>
+    <nav aria-label="Điều hướng chính">
+      <a class="active" href="mentors.html">Tìm cố vấn</a>
+      <a href="mentors.html#mentor-list">Khám phá kỹ năng</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">CÙNG NHAU TIẾN BỘ</p>
+      <h1>Tìm người đồng hành<br>trên hành trình của bạn</h1>
+      <p>Khám phá những cố vấn giàu kinh nghiệm, sẵn sàng chia sẻ và hỗ trợ bạn phát triển.</p>
+      <a class="button" href="#mentor-list">Khám phá cố vấn <span aria-hidden="true">&darr;</span></a>
+    </section>
+
+    <section class="directory content-width" aria-labelledby="directory-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ĐỘI NGŨ CỦA CHÚNG TÔI</p>
+          <h2 id="directory-title">Cố vấn nổi bật</h2>
+        </div>
+        <p>Chọn hồ sơ phù hợp để tìm hiểu thêm</p>
+      </div>
+      <div id="mentor-list" class="mentor-grid" aria-live="polite">
+        <p class="loading-state">Đang tải danh sách cố vấn...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="mentors.html">mentor<span>connect</span></a>
+    <p>Kết nối tri thức, cùng nhau phát triển.</p>
+  </footer>
+</body>
+</html>
