@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lịch hẹn của tôi | Mentor-Mentee Connector</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 0 auto; max-width: 52rem; padding: 1.5rem; color: #172033; }
+    nav { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    a { color: #175cd3; }
+    li { border: 1px solid #d0d5dd; border-radius: .75rem; margin: 1rem 0; padding: 1rem; }
+    h1 { margin-bottom: .5rem; }
+    button { cursor: pointer; padding: .5rem .75rem; }
+  </style>
+</head>
+<body>
+  <nav aria-label="Điều hướng chính">
+    <a href="index.html">Trang chủ</a>
+    <a href="appointments.html" aria-current="page">Lịch hẹn của tôi</a>
+  </nav>
+  <main>
+    <h1>Lịch hẹn của tôi</h1>
+    <p data-appointments-status role="status" aria-live="polite"></p>
+    <ul data-appointments-list aria-label="Danh sách lịch hẹn"></ul>
+  </main>
+  <script src="js/main.js" defer></script>
+</body>
+</html>
